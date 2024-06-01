@@ -408,10 +408,10 @@ In order to achieve modular code it is important to separate code into logical u
 \paragraph {Headers}
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.5\textwidth]{images/header.png}
-	\caption{Typical header file reference flow.}
+	\includegraphics[width=0.4\textwidth]{images/header.png}
+	\includegraphics[width=0.4\textwidth]{images/module.png}
+	\caption{Graphical header vs module reference flow.}
 \end{figure}
-
 The best mental-model is to consider a program as a set of modules, each of which is a translation unit responsible for its own concept. One major disadvantage of the C-style modules using include directives is that each include statement completely injects/copies the contents of said header file into the translation unit (source/.c/.cpp) file. This means that if N files import x.h then x.h's text is copied into N files. This can create serious bloat and increase compile time. Another disadvantage is that the order of includes matters in the source file. Consider the following legitimate example:
 \begin{lstlisting}[style=cpp]
 #include 'a.h'
@@ -425,6 +425,7 @@ doStuff(); // Compiler Error - Object not found
 doStuff(); // Pass
 \end{lstlisting}
 \paragraph{Modules}
+Consider the below usage of \verb!import!. Here we show that we can both \verb!import! and \verb!#include! in the same file. The main advantage of using import over include is that we can avoid excessive code copying from include. Only the units which are 'exported' will be included in the translation unit. Additionally, the compiler will check for the existence of the module and prevent redundant imports. This should considerably improve maintainability and compile times. This can prevent unnecessary complication of source code into .hpp and .cpp files since we can just selectively export specific entities in the .cpp.
 
 \begin{lstlisting}[style=cpp]
 export module Vector;
@@ -437,9 +438,49 @@ export class Vector{
 
 }
 \end{lstlisting}
-
 \subsection{Namespaces}
+Namespaces allow you to use class/function/variable names that are present in different namespaces differently. E.g. you can create your own implementation of C++ STL libraries (e.g. vector, printf, etc.). The simplest way to access an entity in a different namespace is to use the \verb!::! operator (e.g. \verb!std::vector!). To gain access to all names in any namespace use \verb!using namespace <namespace>;!. This is has consequences if used carelessly since it can use names that you may not be aware of and intend to build yourself. These are primarily used to organize libraries.
 \subsection{Arguments}
+Key concerns are:
+\begin{itemize}
+	\item pass by value or reference
+	\item const or mutable
+	\item side-effects (e.g. if an object is moved then previous reference is invalid).
+\end{itemize}
+Default behavior is pass-by-value. However, compiler optimization can implicitly modify to pass-by-reference. It is generally faster to pass-by-value when the \verb!sizeof(object) < 4*sizeof(void*)!. Use \verb!const! modifier if we want to pass by reference, but don't need to actually modify the value
+\lstinputlisting[style=cpp] {sources/arguments.sumTwoVectors.cpp}
+It is common for arguments to have a default value. An example of such usage can be seen here:\newline
+\verb!void print(int value, int base = 10); // 10 is default for base!
+\paragraph{Return} by reference only when returning something that is not local to the caller. Anything local to the caller will be destroyed when the function returns. Most compilers should throw this error at compile-time. If a large object is created inside a function and needs to be returned to the caller it can be achieved by generating a \verb!move! constructor for the object. It is \textit{possible} that even without explicitly defining a move constructor that the compiler can optimize away the copy and implicitly perform a move. This is called \textit{copy elision}. See below for an example in modern copy elision in practice:
+\lstinputlisting[style=cpp] {sources/arguments.copyElision.cpp}
+\paragraph{Deduction} of return type is possible by returning \verb!auto!. This is especially valuable for generics and lambdas. It is possible to display the return type after the function handle and arguments like so:
+\begin{lstlisting}[style=cpp]
+auto sqrt(double); // deduction
+auto sqrt(double) -> double; // suffix-return type
+\end{lstlisting}
+
+\pagebreak
+\section{Errors}
+
+\pagebreak
+\section{Classes}
+\subsection{Concrete Types}
+Behave just like built-in types e.g. complex numbers and infinite-precision integers. Representation is part of its definition. Typically these are used for types which don't change often and depend on private members.
+Upside:
+\begin{itemize}
+	\item Easy to place on stack/heap and in other objects
+	\item Can refer to objects directly, not just via reference
+	\item Initialize objects immediately and completely in constructor
+	\item Copy/move easily
+\end{itemize}
+Downside:
+\begin{itemize}
+	\item Any change causes recompilation.
+\end{itemize}
+\paragraph{Arithmetic} types are a classic example of concrete types, for example complex numbers.
+\subsection{Abstract Types}
+\subsection{Virtual Functions}
+\subsection{Class Hierarchies}
 
 % References
 \begin{thebibliography}{9}
