@@ -465,7 +465,7 @@ auto sqrt(double) -> double; // suffix-return type
 \pagebreak
 \section{Classes}
 \subsection{Concrete Types}
-Behave just like built-in types e.g. complex numbers and infinite-precision integers. Representation is part of its definition. Typically these are used for types which don't change often and depend on private members.
+Behave just like built-in types e.g. complex numbers and infinite-precision integers. Representation is part of its definition. Typically these are used for types which don't change often and depend on private members. Arithmetic types are a classic example of concrete types, for example complex numbers.
 Upside:
 \begin{itemize}
 	\item Easy to place on stack/heap and in other objects
@@ -477,7 +477,29 @@ Downside:
 \begin{itemize}
 	\item Any change causes recompilation.
 \end{itemize}
-\paragraph{Arithmetic} types are a classic example of concrete types, for example complex numbers.
+\begin{description}
+	\item[\href{https://en.cppreference.com/w/cpp/container}{Container}:]
+	      object holding a collection of elements.
+\end{description}
+\begin{description}
+	\item[Destructor:]
+	      the complement of the constructor. Responsible for destroying the object and freeing (usually with \verb!delete[]!) memory to prevent memory leaks. Represented with a tilde prepending the class name.
+\end{description}
+\begin{description}
+	\item[RAII:]
+	      Resource Acquisition Is Initialization. A concept that is used to ensure that objects are properly initialized and destroyed, while preventing user from having to concern with memory management (and thus eliminate "naked" \verb!new! operations.
+\end{description}
+\begin{description}
+	\item[Initializer List:]
+	      construct a container with a list of starting values in a provided list. Added in C++11, this abstracts the very common case where the user would simply iteratively call \verb!push_back()! to achieve the same thing.
+\end{description}
+\paragraph{Type Casts}
+\begin{itemize}
+	\item \verb!static_cast!:
+	\item \verb!reinterpret_cast!:
+	\item \verb!bit_cast!:
+	\item \verb!const_cast!:
+\end{itemize}
 \subsection{Abstract Types}
 \subsection{Virtual Functions}
 \subsection{Class Hierarchies}
@@ -485,7 +507,7 @@ Downside:
 % References
 \begin{thebibliography}{9}
 	\bibitem{latex}
-	Leslie Lamport.
+	.
 	\textit{A Tour of C++: 3rd Edition}.
 	Bjarne Stroustrup, 2022.
 
